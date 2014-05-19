@@ -23,7 +23,7 @@ public class CommandsFromZipFile {
             consoleReader.setPrompt("carbon>");
             consoleReader.addCompleter(
                     new StringsCompleter(
-                            IOUtils.readLines(new GZIPInputStream(CommandsFromZipFile.class.getResourceAsStream("wordlist.txt.gz")))
+                            IOUtils.readLines(new GZIPInputStream(CommandsFromZipFile.class.getResourceAsStream("commandList.txt.gz")))
                     )
             );
             consoleReader.addCompleter(new FileNameCompleter());
