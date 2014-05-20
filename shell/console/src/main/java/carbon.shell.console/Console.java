@@ -42,6 +42,7 @@ public class Console implements Runnable {
         this.terminal = terminal == null ? new UnsupportedTerminal() :terminal;
         this.session = commandProcessor.createSession(this.consoleInput, this.out, this.err);
         reader = new ConsoleReader(this.in,this.out,this.terminal);
+        reader.setPrompt("Carbon>");
         session.put(".jline.reader", reader);
         pipe = new Thread();
         pipe.setName("gogo shell pipe thread");
