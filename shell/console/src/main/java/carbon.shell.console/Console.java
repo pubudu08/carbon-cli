@@ -3,6 +3,7 @@ package carbon.shell.console;
 import jline.Terminal;
 import jline.UnsupportedTerminal;
 import jline.console.ConsoleReader;
+import jline.console.completer.FileNameCompleter;
 import org.apache.felix.gogo.runtime.Parser;
 import org.apache.felix.gogo.runtime.Pipe;
 import org.apache.felix.service.command.CommandProcessor;
@@ -43,6 +44,7 @@ public class Console implements Runnable {
         this.session = commandProcessor.createSession(this.consoleInput, this.out, this.err);
         reader = new ConsoleReader(this.in,this.out,this.terminal);
         reader.setPrompt("Carbon>");
+        reader.addCompleter(new FileNameCompleter().);
         session.put(".jline.reader", reader);
         pipe = new Thread();
         pipe.setName("gogo shell pipe thread");

@@ -9,12 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>shell</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>console</module>
-
-    </modules>
+    <artifactId>carbon.shell.console.commands</artifactId>
 
 
 </project>

@@ -10,6 +10,7 @@
     <version>5.0.0-SNAPSHOT</version>
     <modules>
         <module>shell</module>
+
     </modules>
 
 
@@ -21,6 +22,8 @@
 
         <!-- Apache Felix gogo dependencies-->
         <felix.gogo.version>0.10.0</felix.gogo.version>
+
+        <maven.compilerplugin.version>3.1</maven.compilerplugin.version>
 
 
     </properties>
@@ -66,6 +69,7 @@
     </repositories>
     <build>
         <plugins>
+
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-scr-plugin</artifactId>
@@ -79,6 +83,17 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compilerplugin.version}</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
