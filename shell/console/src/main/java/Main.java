@@ -4,6 +4,9 @@ import carbon.shell.console.commands.Action;
 import carbon.shell.console.commands.Command;
 import carbon.shell.console.jline.TerminalFactory;
 import jline.Terminal;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.felix.gogo.runtime.CommandProcessorImpl;
 import org.apache.felix.gogo.runtime.threadio.ThreadIOImpl;
 import org.apache.felix.service.command.CommandSession;
@@ -22,6 +25,7 @@ import java.util.Enumeration;
 public class Main {
     private String application ="root";
     private String user = "carbon";
+
 
 
     /**
@@ -130,6 +134,7 @@ public class Main {
         Main main = new Main();
         try {
             main.run(args);
+
         } catch (Exception e) {
             e.printStackTrace();
         }

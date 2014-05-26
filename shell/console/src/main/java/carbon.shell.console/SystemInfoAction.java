@@ -13,7 +13,7 @@ import java.util.Locale;
 /**
  * Created by pubudu on 5/21/14.
  */
-@Command(scope = "shell",name = "info",description = " System information")
+@Command(scope = "console",name = "info",description = " System information")
 public class SystemInfoAction extends AbstractAction {
 
     private NumberFormat fmtI = new DecimalFormat("###,###", new DecimalFormatSymbols(Locale.ENGLISH));

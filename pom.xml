@@ -8,13 +8,15 @@
     <artifactId>carbon-cli</artifactId>
     <packaging>pom</packaging>
     <version>5.0.0-SNAPSHOT</version>
+
     <modules>
         <module>shell</module>
-
     </modules>
 
 
     <properties>
+        <!-- WSO2 Carob dependencies -->
+         <carbon.logging.version>4.2.0</carbon.logging.version>
         <!-- Equinox dependency versions -->
         <equinox.osgi.version>3.9.1.v20140110-1610</equinox.osgi.version>
         <equinox.ds.version>1.4.101.v20130813-1853</equinox.ds.version>
@@ -23,15 +25,27 @@
         <!-- Apache Felix gogo dependencies-->
         <felix.gogo.version>0.10.0</felix.gogo.version>
 
+        <!-- JLine Terminal-->
+        <jline.version>2.11</jline.version>
+        <!-- Apache commons IO-->
+        <commons.io.version>2.2</commons.io.version>
+
+        <!--Maven Plugins -->
         <maven.compilerplugin.version>3.1</maven.compilerplugin.version>
+        <maven.bundleplugin.version>2.4.0</maven.bundleplugin.version>
+
+        <!--PAX Logging related dependency versions-->
+        <version.pax.logging.api>1.7.2</version.pax.logging.api>
+        <version.pax.logging.services>1.7.2</version.pax.logging.services>
 
 
     </properties>
+    <dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.logging</artifactId>
-            <version>4.2.0</version>
+            <version>${carbon.logging.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.equinox</groupId>
@@ -56,10 +70,30 @@
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.gogo.command</artifactId>
-            <version>0.10.0</version>
+            <version>${felix.gogo.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons.io.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>jline</groupId>
+            <artifactId>jline</artifactId>
+            <version>${jline.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.logging</groupId>
+            <artifactId>pax-logging-api</artifactId>
+            <version>${version.pax.logging.api}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.logging</groupId>
+            <artifactId>pax-logging-service</artifactId>
+            <version>${version.pax.logging.services}</version>
+        </dependency>
     </dependencies>
+    </dependencyManagement>
     <repositories>
         <repository>
             <id>wso2-nexus</id>
@@ -91,20 +125,6 @@
                     <encoding>UTF-8</encoding>
                     <source>1.6</source>
                     <target>1.6</target>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <Export-Package></Export-Package>
-                        <DynamicImport-Package>*</DynamicImport-Package>
-                    </instructions>
                 </configuration>
             </plugin>
         </plugins>
