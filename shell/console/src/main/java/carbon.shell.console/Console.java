@@ -12,11 +12,13 @@ import jline.console.history.MemoryHistory;
 import jline.console.history.PersistentHistory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.felix.gogo.runtime.CommandNotFoundException;
 import org.apache.felix.gogo.runtime.Parser;
 import org.apache.felix.gogo.runtime.Pipe;
 import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.CommandSession;
 import org.apache.felix.service.command.Converter;
+import org.fusesource.jansi.Ansi;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,6 +57,7 @@ public class Console implements Runnable {
         this.session = commandProcessor.createSession(this.consoleInput, this.out, this.err);
         reader = new ConsoleReader(this.in, this.out, this.terminal);
         reader.setPrompt("Carbon>");
+        session.put("SCOPE","gogo:*");
         reader.addCompleter(new CommandsCompleter(session));
 
         File file = getHistoryFile();
@@ -126,8 +129,8 @@ public class Console implements Runnable {
 
             } catch (IOException e) {
                 e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
+            }catch (Throwable throwable) {
+                logException(throwable);
             }
 
 
@@ -195,6 +198,23 @@ public class Console implements Runnable {
     public File getHistoryFile() {
         String carbonCommandHistory = new File(System.getProperty("user.home"), ".carbon/carbon.history").toString();
         return new File(System.getProperty("carbon.history", carbonCommandHistory));
+
+
+    }
+    private  void logException(Throwable throwable){
+        if (throwable instanceof CommandNotFoundException) {
+            String str = Ansi.ansi()
+                    .fg(Ansi.Color.RED)
+                    .a("[Info] ")
+                    .a(Ansi.Attribute.INTENSITY_BOLD)
+                    .a(((CommandNotFoundException) throwable).getCommand())
+                    .a(Ansi.Attribute.INTENSITY_BOLD_OFF)
+                    .a(", Command not found. Please input valid command.")
+                    .fg(Ansi.Color.DEFAULT).toString();
+            session.getConsole().println(str);
+        }
+
+
 
 
     }
