@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1401183931967
-Build-Jdk: 1.6.0_45
+Bnd-LastModified: 1401872929519
+Build-Jdk: 1.7.0_07
 Built-By: pubudu
 Bundle-Description: OSGi Bundle for Carbon shell
 Bundle-ManifestVersion: 2

@@ -46,7 +46,7 @@ public class CommandsCompleter implements Completer {
             for(String name :namesOfCommands){
                 commandList.add(name);
                 if(name.indexOf(':')>0){
-                    commandList.add(name.substring(0,name.indexOf(':')));
+                    //commandList.add(name.substring(0,name.indexOf(':')));
 
                 }
 

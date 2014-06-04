@@ -5,17 +5,13 @@ import carbon.shell.console.jline.CommandsCompleter;
 import jline.Terminal;
 import jline.UnsupportedTerminal;
 import jline.console.ConsoleReader;
-import jline.console.completer.FileNameCompleter;
-import jline.console.history.FileHistory;
-import jline.console.history.History;
 import jline.console.history.MemoryHistory;
 import jline.console.history.PersistentHistory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.felix.gogo.runtime.CommandNotFoundException;
+import org.apache.felix.gogo.runtime.CommandProcessorImpl;
 import org.apache.felix.gogo.runtime.Parser;
-import org.apache.felix.gogo.runtime.Pipe;
-import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.CommandSession;
 import org.apache.felix.service.command.Converter;
 import org.fusesource.jansi.Ansi;
@@ -24,7 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -32,7 +27,7 @@ import java.util.concurrent.BlockingQueue;
  */
 public class Console implements Runnable {
 
-    private CommandProcessor commandProcessor;
+    private CommandProcessorImpl commandProcessor;
     private Terminal terminal;
     protected CommandSession session;
     private ConsoleReader reader;
@@ -47,7 +42,7 @@ public class Console implements Runnable {
     private BlockingQueue<Integer> queue;
     private static final Log logger = LogFactory.getLog(Console.class);
 
-    public Console(CommandProcessor commandProcessor, Terminal terminal, InputStream in, PrintStream out,
+    public Console(CommandProcessorImpl commandProcessor, Terminal terminal, InputStream in, PrintStream out,
                    PrintStream err) throws IOException {
         this.in = in;
         this.out = out;
@@ -56,8 +51,8 @@ public class Console implements Runnable {
         this.terminal = terminal == null ? new UnsupportedTerminal() : terminal;
         this.session = commandProcessor.createSession(this.consoleInput, this.out, this.err);
         reader = new ConsoleReader(this.in, this.out, this.terminal);
-        reader.setPrompt("Carbon>");
-        session.put("SCOPE","gogo:*");
+        reader.setPrompt(createPrompt("admin@carbon"));
+        session.put("SCOPE","felix:*");
         reader.addCompleter(new CommandsCompleter(session));
 
         File file = getHistoryFile();
@@ -221,5 +216,24 @@ public class Console implements Runnable {
 
     protected void welcome() {
         //TODO welcome msg
+        //sample msg
+       String msg = Ansi.ansi()
+               .a(Ansi.Attribute.INTENSITY_BOLD)
+               .a("Carbon 5 (C5)" )
+               .a(Ansi.Attribute.INTENSITY_BOLD_OFF)
+               .a(" - The next generation of WSO2 Carbon Platform")
+               .newline().toString();
+        System.out.println("\n"+msg);
+
+    }
+
+    private String createPrompt(String promptString){
+           String prompt = Ansi.ansi()
+                   .fg(Ansi.Color.BLUE)
+                   .a(Ansi.Attribute.INTENSITY_BOLD)
+                   .a(promptString+">")
+                   .a(Ansi.Attribute.INTENSITY_BOLD_OFF)
+                   .fg(Ansi.Color.DEFAULT).toString();
+        return prompt;
     }
 }

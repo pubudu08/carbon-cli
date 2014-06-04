@@ -128,6 +128,7 @@ public class Main {
     protected void addCommand(Command command,Function function,CommandProcessorImpl commandProcessor){
         commandProcessor.addCommand(command.scope(),function,command.name());
 
+
     }
     public static void main(String[] args) {
 
