@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Bnd-LastModified: 1401948644432
+Build-Jdk: 1.7.0_07
+Built-By: pubudu
+Bundle-Description: OSGi Bundle for Carbon shell
+Bundle-ManifestVersion: 2
+Bundle-Name: org.wso2.carbon.shell.console
+Bundle-SymbolicName: org.wso2.carbon.shell.console
+Bundle-Version: 5.0.0.SNAPSHOT
+Created-By: Apache Maven Bundle Plugin
+DynamicImport-Package: *
+Import-Package: jline;version="[2.11,3)",jline.console;version="[2.11,3)
+ ",jline.console.completer;version="[2.11,3)",jline.console.history;vers
+ ion="[2.11,3)",org.apache.commons.io;version="[2.2,3)",org.apache.commo
+ ns.logging;version="[1.1,2)",org.apache.felix.gogo.runtime,org.apache.f
+ elix.gogo.runtime.threadio,org.apache.felix.service.command;version="[0
+ .10,1)";status=provisional,org.apache.felix.service.threadio;version="[
+ 0.10,1)";status=provisional,org.fusesource.jansi;version="[1.11,2)"
+Tool: Bnd-2.1.0.20130426-122213

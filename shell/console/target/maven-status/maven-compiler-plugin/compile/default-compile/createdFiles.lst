@@ -1,0 +1,14 @@
+carbon/shell/console/Console.class
+carbon/shell/console/commands/Command.class
+carbon/shell/console/jline/CarbonHistory.class
+Main.class
+carbon/shell/console/commands/Action.class
+carbon/shell/console/jline/TerminalFactory.class
+carbon/shell/console/jline/CommandsCompleter.class
+carbon/shell/console/commands/AbstractAction.class
+carbon/shell/console/Shell.class
+CommandsFromZipFile.class
+carbon/shell/console/ClearAction.class
+carbon/shell/console/commands/AbstractCommand.class
+Main$1.class
+carbon/shell/console/SystemInfoAction.class
