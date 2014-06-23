@@ -50,33 +50,6 @@ public class Console implements Runnable {
         this.commandProcessor = commandProcessor;
         this.terminal = terminal == null ? new UnsupportedTerminal() : terminal;
         this.session = commandProcessor.createSession(this.consoleInput, this.out, this.err);
-        reader = new ConsoleReader(this.in, this.out, this.terminal);
-        reader.setPrompt(createPrompt("admin@carbon"));
-        session.put("SCOPE","felix:*");
-        reader.addCompleter(new CommandsCompleter(session));
-
-        File file = getHistoryFile();
-        try {
-            file.getParentFile().mkdir();
-            file.createNewFile();
-            reader.setHistory(new CarbonHistory(file));
-
-        } catch (Exception e) {
-
-            //LOGGER.error("Can not read history from file " + file + ". Using in memory history", e);
-        }
-        if (reader != null && reader.getHistory() instanceof MemoryHistory) {
-
-            //TODO implement if Shell history maxvalue reached, tell carbon to use MemoryHistory
-
-        }
-        session.put(".jline.reader", reader);
-        session.put(".jline.history", reader.getHistory());
-        pipe = new Thread();
-        pipe.setName("gogo shell pipe thread");
-        pipe.setDaemon(true);
-
-
     }
 
     public CommandSession getSession() {
@@ -103,6 +76,34 @@ public class Console implements Runnable {
     }
 
 
+    public void init(CommandSession session) throws IOException {
+        reader = new ConsoleReader(this.in, this.out, this.terminal);
+        reader.setPrompt(createPrompt(session.get("USER")+"@"+session.get("APPLICATION")));
+        //session.put("SCOPE","felix:*");
+        reader.addCompleter(new CommandsCompleter(session));
+
+        File file = getHistoryFile();
+        try {
+            file.getParentFile().mkdir();
+            file.createNewFile();
+            reader.setHistory(new CarbonHistory(file));
+
+        } catch (Exception e) {
+
+            //LOGGER.error("Can not read history from file " + file + ". Using in memory history", e);
+        }
+        if (reader != null && reader.getHistory() instanceof MemoryHistory) {
+
+            //TODO implement if Shell history maxvalue reached, tell carbon to use MemoryHistory
+
+        }
+        session.put(".jline.reader", reader);
+        session.put(".jline.history", reader.getHistory());
+        pipe = new Thread();
+        pipe.setName("gogo shell pipe thread");
+        pipe.setDaemon(true);
+
+    }
     @Override
     public void run() {
 
@@ -158,6 +159,7 @@ public class Console implements Runnable {
         boolean loop = true;
         boolean first = true;
         while (loop) {
+            //TODO checkInterrupt() issue is, if VK_ESCAPE keystroke happens whole program will not proceed
             //checkInterrupt();
             String line = reader.readLine();
 

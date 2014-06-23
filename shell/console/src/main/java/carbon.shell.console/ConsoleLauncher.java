@@ -1,12 +1,11 @@
-import carbon.shell.console.Console;
+package carbon.shell.console;
+
+
 import carbon.shell.console.commands.AbstractCommand;
 import carbon.shell.console.commands.Action;
 import carbon.shell.console.commands.Command;
 import carbon.shell.console.jline.TerminalFactory;
 import jline.Terminal;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.felix.gogo.runtime.CommandProcessorImpl;
 import org.apache.felix.gogo.runtime.threadio.ThreadIOImpl;
 import org.apache.felix.service.command.CommandSession;
@@ -14,72 +13,54 @@ import org.apache.felix.service.command.Function;
 import org.fusesource.jansi.AnsiConsole;
 
 import java.io.*;
+
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Enumeration;
 
+public class ConsoleLauncher implements ConsoleRuntime {
 
-/**
- * Created by pubudu on 5/20/14.
- */
-public class Main {
-    private String application ="carbon";
-    private String user = "root";
+    private final String USER= "admin";
+    private final String APPLICATION = "carbon";
 
-
+    private TerminalFactory terminalFactory;
+    private Terminal terminal;
+    private CommandSession session;
+    private Console console;
 
     /**
      *
-     * @param args
      * @throws Exception
      */
-    public void run(String args[]) throws Exception{
+    public void initiateConsole () throws Exception {
 
         ThreadIOImpl threadIO = new ThreadIOImpl() ;
         threadIO.start();
+
         InputStream in = unwrap(System.in);
         PrintStream out = wrap(unwrap(System.out));
         PrintStream err = wrap(unwrap(System.err));
+
         CommandProcessorImpl commandProcessor = new CommandProcessorImpl(threadIO);
-        ClassLoader classLoader = Main.class.getClassLoader();
+        ClassLoader classLoader = Test.class.getClassLoader();
 
-        //Discover custom carbon.shell.console.commands by going through the text file 'classPath.txt'
-        discoverCommands(commandProcessor, classLoader);
-        final TerminalFactory terminalFactory = new TerminalFactory();
-        final Terminal terminal = terminalFactory.getTerminal();
-        Console console =new Console(commandProcessor,terminal,in,out,err);
-        CommandSession session = console.getSession();
-        session.put("USER", user);
-        session.put("APPLICATION", application);
-        session.put(".jline.terminal", terminal);
-        console.init(session);
-        console.run();
-        terminalFactory.destroy();
-    }
-    private static PrintStream wrap(PrintStream printStream) {
-        OutputStream outputStream = AnsiConsole.wrapOutputStream(printStream);
-        if (outputStream instanceof PrintStream) {
-            return ((PrintStream) outputStream);
-        } else {
-            return new PrintStream(outputStream);
-        }
-    }
+        initiateBasicCommands(commandProcessor, classLoader);
 
-    private static <T> T unwrap(T stream) {
-        try {
-            Method mth = stream.getClass().getMethod("getRoot");
-            return (T) mth.invoke(stream);
-        } catch (Throwable t) {
-            return stream;
-        }
+        terminalFactory = new TerminalFactory();
+        terminal = terminalFactory.getTerminal();
+
+        console =new Console(commandProcessor,terminal,in,out,err);
+        session = console.getSession();
+
     }
 
     /**
      *
      * @param commandProcessor
      * @param classLoader
+     * @throws java.io.IOException
      */
-    public void discoverCommands(CommandProcessorImpl commandProcessor, ClassLoader classLoader) throws ClassNotFoundException,IOException{
+    public void initiateBasicCommands(CommandProcessorImpl commandProcessor, ClassLoader classLoader) throws IOException, ClassNotFoundException {
         Enumeration<URL> urlEnumeration  = classLoader.getResources("META-INF/command") ;
         while (urlEnumeration.hasMoreElements()){
 
@@ -102,46 +83,50 @@ public class Main {
                                 throw new RuntimeException(e);
                             }
                         }
-
-
                     } ;
-                    addCommand(command, function, commandProcessor);
 
-
+                    //Adding commands
+                    commandProcessor.addCommand(command.scope(),function,command.name());
                 }
                 line = bufferedReader.readLine();
 
             }
             bufferedReader.close();
         }
-
-
     }
-
-
 
     /**
      *
-     * @param command
-     * @param function
-     * @param commandProcessor
+     * @throws Exception
      */
-    protected void addCommand(Command command,Function function,CommandProcessorImpl commandProcessor){
-        commandProcessor.addCommand(command.scope(),function,command.name());
+    public void run() throws Exception {
+        initiateConsole();
+        session.put("USER", USER);
+        session.put("APPLICATION", APPLICATION);
+        session.put(".jline.terminal", terminal);
 
+        console.init(session);
+        console.run();
+        terminalFactory.destroy();
 
     }
-    public static void main(String[] args) {
 
-        Main main = new Main();
-        try {
-            main.run(args);
-
-        } catch (Exception e) {
-            e.printStackTrace();
+    private static PrintStream wrap(PrintStream printStream) {
+        // AnsiConsole Print Stream wrapper
+        OutputStream outputStream = AnsiConsole.wrapOutputStream(printStream);
+        if (outputStream instanceof PrintStream) {
+            return ((PrintStream) outputStream);
+        } else {
+            return new PrintStream(outputStream);
         }
     }
 
+    private static <T> T unwrap(T stream) {
+        try {
+            Method mth = stream.getClass().getMethod("getRoot");
+            return (T) mth.invoke(stream);
+        } catch (Throwable t) {
+            return stream;
+        }
+    }
 }
-
-
