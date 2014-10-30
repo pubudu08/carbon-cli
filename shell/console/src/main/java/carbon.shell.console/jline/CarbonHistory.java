@@ -18,16 +18,27 @@
 package carbon.shell.console.jline;
 
 import jline.console.history.FileHistory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 
+/**
+ * Responsible of creating CarbonHistory file
+ */
 public class CarbonHistory extends FileHistory {
-
+	private static Log LOGGER = LogFactory.getLog(CarbonHistory.class);
 	boolean failed = false;
 	boolean loading = false;
 
+	/**
+	 * CarbonHistory constructor
+	 *
+	 * @param file
+	 * @throws IOException
+	 */
 	public CarbonHistory(File file) throws IOException {
 		super(file);
 	}
@@ -57,7 +68,7 @@ public class CarbonHistory extends FileHistory {
 				super.flush();
 			} catch (IOException e) {
 				failed = true;
-				LOGGER.debug("Could not write history file: "+ getFile(), e);
+				LOGGER.debug("Could not write history file: " + getFile(), e);
 			}
 		}
 	}
@@ -69,9 +80,8 @@ public class CarbonHistory extends FileHistory {
 				super.purge();
 			} catch (IOException e) {
 				failed = true;
-				LOGGER.debug("Could not delete history file: "+ getFile(), e);
+				LOGGER.debug("Could not delete history file: " + getFile(), e);
 			}
 		}
 	}
-
 }

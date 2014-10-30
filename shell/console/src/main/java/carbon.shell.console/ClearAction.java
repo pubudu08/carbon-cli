@@ -17,7 +17,6 @@
 */
 package carbon.shell.console;
 
-
 import carbon.shell.console.commands.AbstractAction;
 import carbon.shell.console.commands.Command;
 

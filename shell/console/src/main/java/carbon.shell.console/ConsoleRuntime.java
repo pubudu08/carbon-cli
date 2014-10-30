@@ -22,25 +22,28 @@ import org.apache.felix.gogo.runtime.CommandProcessorImpl;
 import java.io.IOException;
 
 /**
- *
+ *   Responsible of creating console runtime,
  */
 public interface ConsoleRuntime {
+
     /**
-     *
+     * initiate console
      * @return
      * @throws java.io.IOException
      */
     public void initiateConsole() throws Exception;
 
     /**
-     *
+     *  Responsible of initiating basic commands
      * @param promptString
      * @return
      */
-    public void initiateBasicCommands(CommandProcessorImpl commandProcessor, ClassLoader classLoader) throws IOException, ClassNotFoundException;
+    public void initiateBasicCommands(CommandProcessorImpl commandProcessor,
+                                      ClassLoader classLoader)
+      throws IOException,ClassNotFoundException;
 
     /**
-     *
+     * Console executor
      */
     public void run() throws Exception ;
 

@@ -17,22 +17,14 @@
 */
 package carbon.shell.console;
 
-
-
-/**
- * Created by pubudu on 6/5/14.
- */
 public class ConsoleRuntimeFactory {
 
     /**
-     *
+     * Responsible of returning console runtime
      * @return
      */
     public static ConsoleRuntime createConsoleRuntime(){
-
-        ConsoleRuntime consoleRuntime = new ConsoleLauncher();
-        return  consoleRuntime;
-
+	    return new ConsoleLauncher();
     }
 
 }

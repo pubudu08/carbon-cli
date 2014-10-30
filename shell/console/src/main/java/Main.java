@@ -117,6 +117,7 @@ public class Main {
 
 
 	/**
+	 * This method will add command objects to CommandProcessor
 	 * @param command
 	 * @param function
 	 * @param commandProcessor
@@ -140,7 +141,7 @@ public class Main {
 	}
 
 	/**
-	 *
+	 * wrap a given print stream
 	 * @param printStream
 	 * @return
 	 */
@@ -154,7 +155,7 @@ public class Main {
 	}
 
 	/**
-	 *
+	 * Unwrap a given print stream
 	 * @param stream
 	 * @param <T>
 	 * @return

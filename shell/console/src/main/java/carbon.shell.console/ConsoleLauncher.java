@@ -29,121 +29,132 @@ import org.apache.felix.service.command.CommandSession;
 import org.apache.felix.service.command.Function;
 import org.fusesource.jansi.AnsiConsole;
 
-import java.io.*;
-
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Enumeration;
 
 public class ConsoleLauncher implements ConsoleRuntime {
 
-    private final String USER= "admin";
-    private final String APPLICATION = "carbon";
+	private final String USER = "admin";
+	private final String APPLICATION = "carbon";
 
-    private TerminalFactory terminalFactory;
-    private Terminal terminal;
-    private CommandSession session;
-    private Console console;
+	private TerminalFactory terminalFactory;
+	private Terminal terminal;
+	private CommandSession session;
+	private Console console;
 
-    /**
-     *
-     * @throws Exception
-     */
-    public void initiateConsole () throws Exception {
+	/**
+	 * @throws Exception
+	 */
+	public void initiateConsole() throws Exception {
 
-        ThreadIOImpl threadIO = new ThreadIOImpl() ;
-        threadIO.start();
+		ThreadIOImpl threadIO = new ThreadIOImpl();
+		threadIO.start();
 
-        InputStream in = unwrap(System.in);
-        PrintStream out = wrap(unwrap(System.out));
-        PrintStream err = wrap(unwrap(System.err));
+		InputStream in = unwrap(System.in);
+		PrintStream out = wrap(unwrap(System.out));
+		PrintStream err = wrap(unwrap(System.err));
+		CommandProcessorImpl commandProcessor = new CommandProcessorImpl(threadIO);
+		ClassLoader classLoader = Test.class.getClassLoader();
+		initiateBasicCommands(commandProcessor, classLoader);
+		terminalFactory = new TerminalFactory();
+		terminal = terminalFactory.getTerminal();
+		console = new Console(commandProcessor, terminal, in, out, err);
+		session = console.getSession();
 
-        CommandProcessorImpl commandProcessor = new CommandProcessorImpl(threadIO);
-        ClassLoader classLoader = Test.class.getClassLoader();
+	}
 
-        initiateBasicCommands(commandProcessor, classLoader);
+	/**
+	 * Initiate basic commands
+	 * @param commandProcessor
+	 * @param classLoader
+	 * @throws java.io.IOException
+	 */
+	public void initiateBasicCommands(CommandProcessorImpl commandProcessor,
+	                                  ClassLoader classLoader) throws IOException,
+	                                                                  ClassNotFoundException {
+		Enumeration<URL> urlEnumeration = classLoader.getResources("META-INF/command");
+		while (urlEnumeration.hasMoreElements()) {
 
-        terminalFactory = new TerminalFactory();
-        terminal = terminalFactory.getTerminal();
+			URL url = urlEnumeration.nextElement();
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(url
+			  .openStream()));
+			String line = bufferedReader.readLine();
+			while (line != null) {
+				line = line.trim();
+				if (line.length() > 0 && line.charAt(0) != '#') {
+					final Class<Action> actionClass = (Class<Action>) classLoader.loadClass(line);
+					Command command = actionClass.getAnnotation(Command.class);
+					Function function = new AbstractCommand() {
+						@Override
+						public Action createNewAction() {
+							try {
+								return ((Class<? extends Action>) actionClass).newInstance();
+							} catch (InstantiationException e) {
+								throw new RuntimeException(e);
+							} catch (IllegalAccessException e) {
+								throw new RuntimeException(e);
+							}
+						}
+					};
 
-        console =new Console(commandProcessor,terminal,in,out,err);
-        session = console.getSession();
+					//Adding commands
+					commandProcessor.addCommand(command.scope(), function, command.name());
+				}
+				line = bufferedReader.readLine();
 
-    }
+			}
+			bufferedReader.close();
+		}
+	}
 
-    /**
-     *
-     * @param commandProcessor
-     * @param classLoader
-     * @throws java.io.IOException
-     */
-    public void initiateBasicCommands(CommandProcessorImpl commandProcessor, ClassLoader classLoader) throws IOException, ClassNotFoundException {
-        Enumeration<URL> urlEnumeration  = classLoader.getResources("META-INF/command") ;
-        while (urlEnumeration.hasMoreElements()){
+	/**
+	 * execute console
+	 * @throws Exception
+	 */
+	public void run() throws Exception {
+		initiateConsole();
+		session.put("USER", USER);
+		session.put("APPLICATION", APPLICATION);
+		session.put(".jline.terminal", terminal);
+		console.init(session);
+		console.run();
+		terminalFactory.destroy();
+	}
 
-            URL url = urlEnumeration.nextElement();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(url.openStream()));
-            String line = bufferedReader.readLine();
-            while (line !=null){
-                line = line.trim();
-                if(line.length()>0 && line.charAt(0) !='#'){
-                    final Class <Action> actionClass = (Class<Action>) classLoader.loadClass(line);
-                    Command command = actionClass.getAnnotation(Command.class);
-                    Function function = new AbstractCommand() {
-                        @Override
-                        public Action createNewAction() {
-                            try {
-                                return ((Class<? extends Action>) actionClass).newInstance();
-                            } catch (InstantiationException e) {
-                                throw new RuntimeException(e);
-                            } catch (IllegalAccessException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                    } ;
+	/**
+	 * AnsiConsole Print Stream wrapper
+	 * @param printStream
+	 * @return
+	 */
+	private static PrintStream wrap(PrintStream printStream) {
+		// AnsiConsole Print Stream wrapper
+		OutputStream outputStream = AnsiConsole.wrapOutputStream(printStream);
+		if (outputStream instanceof PrintStream) {
+			return ((PrintStream) outputStream);
+		} else {
+			return new PrintStream(outputStream);
+		}
+	}
 
-                    //Adding commands
-                    commandProcessor.addCommand(command.scope(),function,command.name());
-                }
-                line = bufferedReader.readLine();
-
-            }
-            bufferedReader.close();
-        }
-    }
-
-    /**
-     *
-     * @throws Exception
-     */
-    public void run() throws Exception {
-        initiateConsole();
-        session.put("USER", USER);
-        session.put("APPLICATION", APPLICATION);
-        session.put(".jline.terminal", terminal);
-
-        console.init(session);
-        console.run();
-        terminalFactory.destroy();
-
-    }
-
-    private static PrintStream wrap(PrintStream printStream) {
-        // AnsiConsole Print Stream wrapper
-        OutputStream outputStream = AnsiConsole.wrapOutputStream(printStream);
-        if (outputStream instanceof PrintStream) {
-            return ((PrintStream) outputStream);
-        } else {
-            return new PrintStream(outputStream);
-        }
-    }
-
-    private static <T> T unwrap(T stream) {
-        try {
-            Method mth = stream.getClass().getMethod("getRoot");
-            return (T) mth.invoke(stream);
-        } catch (Throwable t) {
-            return stream;
-        }
-    }
+	/**
+	 * AnsiConsole Print Stream unwrapper
+	 * @param stream
+	 * @param <T>
+	 * @return
+	 */
+	private static <T> T unwrap(T stream) {
+		try {
+			Method mth = stream.getClass().getMethod("getRoot");
+			return (T) mth.invoke(stream);
+		} catch (Throwable t) {
+			return stream;
+		}
+	}
 }

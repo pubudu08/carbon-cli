@@ -28,8 +28,12 @@ import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 
 public class CommandsFromZipFile {
-	private static Log LOGGER = LogFactory.getLog(Main.class);
+	private static Log LOGGER = LogFactory.getLog(CommandsFromZipFile.class);
 
+	/**
+	 *  Sample test to retrieve command value using zip file
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		//by default it sets to Ctrl+D
 		System.setProperty("jline.shutdownhook", "true");

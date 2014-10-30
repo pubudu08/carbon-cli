@@ -20,7 +20,6 @@ package carbon.shell.console.commands;
 import org.apache.felix.service.command.CommandSession;
 
 public abstract class AbstractAction implements Action {
-	// protected final Logger log = LoggerFactory.getLogger(getClass());
 	protected CommandSession session;
 
 	public Object execute(CommandSession session) throws Exception {
